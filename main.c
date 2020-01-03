@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "caesar_cipher.h"
 
 #define SHIFT 5
