@@ -5,6 +5,9 @@
 
 #define lowercase_char_index(c) ((c) - 97);
 
+typedef char (* convert_char_func)(char, int);
+
+static char *convert(char *text, int shift, convert_char_func func);
 static void *allocate_memory(int size);
 static char encrypt_char(char c, int shift);
 static int  mod(int x, int y);
@@ -14,17 +17,17 @@ static char alphabet[] = "abcdefghijklmnopqrstuvwxyz";
 static int  alphabet_len = 26;
 
 char *encrypt(char *plain_text, int shift) {
-  int length = strlen(plain_text);
-  char *cipher_text = allocate_memory(length+1);
-  for (int i = 0; plain_text[i] != '\0'; i++) {
-    if (isalpha(plain_text[i])) {
-      cipher_text[i] = encrypt_char(plain_text[i], shift);
-    } else {
-      cipher_text[i] = plain_text[i];
-    }
+  return convert(plain_text, shift, encrypt_char);
+}
+
+char *convert(char *text, int shift, convert_char_func func) {
+  int length = strlen(text);
+  char *result_text = allocate_memory(length+1);
+  for (int i = 0; text[i] != '\0'; i++) {
+    result_text[i] = func(text[i], shift);
   }
-  cipher_text[length] = '\0';
-  return cipher_text;
+  result_text[length] = '\0';
+  return result_text;
 }
 
 static void *allocate_memory(int size) {
@@ -37,6 +40,7 @@ static void *allocate_memory(int size) {
 }
 
 static char encrypt_char(char c, int shift) {
+  if (!islower(c)) return c;
   int char_index = lowercase_char_index(c);
   return alphabet[mod(char_index + shift, alphabet_len)];
 }
@@ -47,21 +51,11 @@ static int mod(int x, int y) {
 }
 
 char *decrypt(char *cipher_text, int shift) {
-  int length = strlen(cipher_text);
-  char *plain_text = allocate_memory(length+1);
-  for (int i = 0; cipher_text[i] != '\0'; i++) {
-    char c = cipher_text[i];
-    if (isalpha(c) && islower(c)) {
-      plain_text[i] = decrypt_char(c, shift);
-    } else {
-      plain_text[i] = c;
-    }
-  }
-  plain_text[length] = '\0';
-  return plain_text;
+  return convert(cipher_text, shift, decrypt_char);
 }
 
 static char decrypt_char(char c, int shift) {
+  if (!islower(c)) return c;
   int char_index = lowercase_char_index(c);
   return alphabet[mod(char_index - shift, alphabet_len)];
 }
