@@ -1,2 +1,1 @@
-Simple Caesar Cipher implementation
-In C
+Simple Caesar Cipher implementation in C
